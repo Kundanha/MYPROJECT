@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace TodoApi.Controllers;
+namespace WealthForgePro.Controllers;
 
 [ApiController]
 [Route("[controller]")]
