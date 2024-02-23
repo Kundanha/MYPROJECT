@@ -11,6 +11,7 @@ namespace WealthForgePro.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class TransactionController : ControllerBase
     {
         private readonly WealthForgeContext _context;

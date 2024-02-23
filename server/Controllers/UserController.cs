@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using WealthForgePro.Models;
 
 namespace WealthForgePro.Controllers
@@ -24,6 +28,7 @@ namespace WealthForgePro.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
+            Console.WriteLine("here");
             return await _context.Users.ToListAsync();
         }
 
@@ -83,6 +88,31 @@ namespace WealthForgePro.Controllers
             return CreatedAtAction("GetUser", new { id = user.UserID }, user);
         }
 
+        // POST: api/User/Login
+        [HttpPost("Login")]
+        public async Task<ActionResult<User>> Login(LoginModel model)
+        {
+           
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username && u.Password == model.Password);
+
+                if (user == null)
+                {
+                    return NotFound("Invalid username or password");
+                }
+
+                // Here you may generate JWT token for authenticated user and return it as response
+                var token = GenerateJwtToken(user);
+
+                return Ok(token); // Return user information or token
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         // DELETE: api/User/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
@@ -103,5 +133,30 @@ namespace WealthForgePro.Controllers
         {
             return _context.Users.Any(e => e.UserID == id);
         }
+
+        // Helper method to generate JWT token
+        private string GenerateJwtToken(User user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your_secret_key_here"));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                // Add additional claims as needed (e.g., roles, permissions)
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: "your_issuer_here",
+                audience: "your_audience_here",
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1), // Token expiration time
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
     }
 }

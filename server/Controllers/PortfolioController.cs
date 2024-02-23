@@ -11,47 +11,48 @@ namespace WealthForgePro.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AssetController : ControllerBase
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public class PortfolioController : ControllerBase
     {
         private readonly WealthForgeContext _context;
 
-        public AssetController(WealthForgeContext context)
+        public PortfolioController(WealthForgeContext context)
         {
             _context = context;
         }
 
-        // GET: api/Asset
+        // GET: api/Portfolio
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AssetClass>>> GetAssetClass()
+        public async Task<ActionResult<IEnumerable<Portfolio>>> GetPortfolio()
         {
-            return await _context.AssetClass.ToListAsync();
+            return await _context.Portfolio.ToListAsync();
         }
 
-        // GET: api/Asset/5
+        // GET: api/Portfolio/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AssetClass>> GetAssetClass(int id)
+        public async Task<ActionResult<Portfolio>> GetPortfolio(int id)
         {
-            var assetClass = await _context.AssetClass.FindAsync(id);
+            var portfolio = await _context.Portfolio.FindAsync(id);
 
-            if (assetClass == null)
+            if (portfolio == null)
             {
                 return NotFound();
             }
 
-            return assetClass;
+            return portfolio;
         }
 
-        // PUT: api/Asset/5
+        // PUT: api/Portfolio/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAssetClass(int id, AssetClass assetClass)
+        public async Task<IActionResult> PutPortfolio(int id, Portfolio portfolio)
         {
-            if (id != assetClass.AssetClassID)
+            if (id != portfolio.PortfolioID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(assetClass).State = EntityState.Modified;
+            _context.Entry(portfolio).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +60,7 @@ namespace WealthForgePro.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AssetClassExists(id))
+                if (!PortfolioExists(id))
                 {
                     return NotFound();
                 }
@@ -72,36 +73,36 @@ namespace WealthForgePro.Controllers
             return NoContent();
         }
 
-        // POST: api/Asset
+        // POST: api/Portfolio
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AssetClass>> PostAssetClass(AssetClass assetClass)
+        public async Task<ActionResult<Portfolio>> PostPortfolio(Portfolio portfolio)
         {
-            _context.AssetClass.Add(assetClass);
+            _context.Portfolio.Add(portfolio);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetAssetClass", new { id = assetClass.AssetClassID }, assetClass);
+            return CreatedAtAction("GetPortfolio", new { id = portfolio.PortfolioID }, portfolio);
         }
 
-        // DELETE: api/Asset/5
+        // DELETE: api/Portfolio/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAssetClass(int id)
+        public async Task<IActionResult> DeletePortfolio(int id)
         {
-            var assetClass = await _context.AssetClass.FindAsync(id);
-            if (assetClass == null)
+            var portfolio = await _context.Portfolio.FindAsync(id);
+            if (portfolio == null)
             {
                 return NotFound();
             }
 
-            _context.AssetClass.Remove(assetClass);
+            _context.Portfolio.Remove(portfolio);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool AssetClassExists(int id)
+        private bool PortfolioExists(int id)
         {
-            return _context.AssetClass.Any(e => e.AssetClassID == id);
+            return _context.Portfolio.Any(e => e.PortfolioID == id);
         }
     }
 }
